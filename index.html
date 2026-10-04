@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A to-do list web app built with HTML, CSS and JavaScript.">
+  <title>TaskBoard – To-Do List</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <script>
+    /* Apply saved theme before first paint to avoid a flash */
+    (function () {
+      try {
+        var t = localStorage.getItem('taskboard:theme');
+        if (!t) t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        document.documentElement.dataset.theme = t;
+      } catch (e) { document.documentElement.dataset.theme = 'light'; }
+    })();
+  </script>
+</head>
+<body>
+  <a class="skip-link" href="#task-list">Skip to tasks</a>
+
+  <header class="app-header">
+    <div class="container header-inner">
+      <div>
+        <h1>TaskBoard</h1>
+        <p class="subtitle" id="stats" aria-live="polite"></p>
+      </div>
+      <div class="header-actions">
+        <button type="button" class="btn btn-icon" id="theme-toggle" aria-label="Switch to dark mode">
+          <span aria-hidden="true" id="theme-icon">🌙</span>
+        </button>
+        <button type="button" class="btn btn-primary" id="add-task-btn">+ Add task</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="toolbar" aria-label="Search, filter and sort">
+      <div class="field search-field">
+        <label for="search">Search tasks</label>
+        <input type="search" id="search" placeholder="Search title or description" autocomplete="off">
+      </div>
+
+      <div class="field">
+        <label for="sort">Sort by</label>
+        <select id="sort">
+          <option value="created">Created date (newest)</option>
+          <option value="due">Due date (soonest)</option>
+          <option value="priority">Priority (high first)</option>
+        </select>
+      </div>
+
+      <div class="filters" role="group" aria-label="Filter tasks">
+        <button type="button" class="chip" data-filter="all" aria-pressed="true">All</button>
+        <button type="button" class="chip" data-filter="active" aria-pressed="false">Active</button>
+        <button type="button" class="chip" data-filter="completed" aria-pressed="false">Completed</button>
+        <button type="button" class="chip" data-filter="high" aria-pressed="false">High priority</button>
+      </div>
+    </section>
+
+    <div id="loading" class="state" role="status" hidden>
+      <span class="spinner" aria-hidden="true"></span> Loading your tasks…
+    </div>
+
+    <div id="empty" class="state empty" hidden>
+      <h2 id="empty-title">No tasks yet</h2>
+      <p id="empty-text">Add your first task to get started.</p>
+      <button type="button" class="btn btn-primary" id="empty-add-btn">Add a task</button>
+    </div>
+
+    <ul id="task-list" class="task-list" aria-label="Tasks"></ul>
+
+    <div class="list-footer" id="list-footer" hidden>
+      <button type="button" class="btn btn-danger-ghost" id="clear-completed">Clear completed tasks</button>
+    </div>
+  </main>
+
+  <footer class="app-footer container">
+    <p>Built by Bhaskar Goswami · B.Sc. Information Technology</p>
+  </footer>
+
+  <!-- Add / edit dialog -->
+  <dialog id="task-dialog" aria-labelledby="dialog-title">
+    <form id="task-form" novalidate>
+      <h2 id="dialog-title">Add task</h2>
+
+      <div class="field">
+        <label for="f-title">Title <span class="req">(required)</span></label>
+        <input type="text" id="f-title" name="title" maxlength="100" required aria-describedby="err-title">
+        <p class="error" id="err-title" role="alert"></p>
+      </div>
+
+      <div class="field">
+        <label for="f-description">Description</label>
+        <textarea id="f-description" name="description" rows="3" maxlength="500" aria-describedby="err-description"></textarea>
+        <p class="error" id="err-description" role="alert"></p>
+      </div>
+
+      <div class="row">
+        <div class="field">
+          <label for="f-priority">Priority</label>
+          <select id="f-priority" name="priority">
+            <option value="low">Low</option>
+            <option value="medium" selected>Medium</option>
+            <option value="high">High</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="f-due">Due date</label>
+          <input type="date" id="f-due" name="dueDate" aria-describedby="err-due">
+          <p class="error" id="err-due" role="alert"></p>
+        </div>
+        <div class="field">
+          <label for="f-status">Status</label>
+          <select id="f-status" name="status">
+            <option value="pending">Pending</option>
+            <option value="completed">Completed</option>
+          </select>
+        </div>
+      </div>
+
+      <p class="error form-error" id="err-form" role="alert"></p>
+
+      <div class="dialog-actions">
+        <button type="button" class="btn" id="cancel-btn">Cancel</button>
+        <button type="submit" class="btn btn-primary" id="save-btn">Save task</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Confirmation dialog -->
+  <dialog id="confirm-dialog" aria-labelledby="confirm-title" aria-describedby="confirm-text">
+    <form method="dialog">
+      <h2 id="confirm-title">Are you sure?</h2>
+      <p id="confirm-text"></p>
+      <div class="dialog-actions">
+        <button type="submit" value="cancel" class="btn" id="confirm-cancel">Cancel</button>
+        <button type="submit" value="ok" class="btn btn-danger" id="confirm-ok">Delete</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script type="module" src="css/js/app.js"></script>
+</body>
+</html>
