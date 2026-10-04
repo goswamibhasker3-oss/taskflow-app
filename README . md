@@ -49,6 +49,11 @@ python -m http.server 8000 --bind 127.0.0.1
 ```
 Open http://localhost:8000. (VS Code's "Live Server" extension also works.)
 
+## Deploy to GitHub Pages
+Push to the `main` branch to deploy the site automatically with the workflow in
+`.github/workflows/deploy.yml`. After the workflow succeeds, the site is available at
+https://goswamibhasker3-oss.github.io/taskflow-app/.
+
 ## Architecture
 - `validation.js` – pure functions, no DOM or storage.
 - `taskManager.js` – owns the task list and rules. It talks to storage only through `getAll()` and `saveAll(tasks)`.
