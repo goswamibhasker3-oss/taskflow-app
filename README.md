@@ -1,0 +1,80 @@
+# TaskBoard – To-Do List Web App
+
+A responsive to-do list built with plain HTML, CSS and JavaScript (ES modules). Tasks are saved in the browser's `localStorage`, and the code is structured so a backend can be added later without rewriting the app.
+
+**Author:** Bhaskar Goswami – B.Sc. Information Technology
+
+## Tech stack
+- HTML5 (semantic markup, native `<dialog>`)
+- CSS3 (custom properties, grid/flexbox, media queries)
+- JavaScript (ES modules, no frameworks, no build step)
+- Browser `localStorage` for persistence
+
+No backend, database or external libraries are used in this version.
+
+## Features
+- Add, edit and delete tasks; mark as completed or pending
+- Task fields: title, description, priority (Low/Medium/High), due date, status, created date
+- Filters: All, Active, Completed, High priority
+- Search by title or description
+- Sort by due date, priority or created date
+- Data persists after refresh
+- Light/dark theme (follows the system setting on first visit, then remembers your choice)
+- Loading state, empty states, toast messages
+- Confirmation dialogs before deleting a task or clearing completed tasks
+- Validation: required title, length limits, real calendar dates, duplicate detection (same title + due date), and protection against double submits
+- Accessibility: semantic HTML, labelled controls, keyboard navigation, visible focus, skip link, `aria-live` updates, focus-trapped dialogs, reduced-motion support
+
+## Folder structure
+```
+todo-app/
+├── index.html
+├── README.md
+└── css/
+    ├── styles.css
+    └── js/
+        ├── app.js           # entry point, connects the modules
+        ├── ui.js            # DOM rendering and events
+        ├── taskmanager.js   # task logic: CRUD, filter, search, sort
+        ├── storage.js       # localStorage adapter + theme storage
+        └── validation.js    # validation rules
+```
+
+## Setup
+ES modules do not load from `file://` in most browsers, so use a local server.
+
+```bash
+cd taskflow
+python -m http.server 8000 --bind 127.0.0.1
+```
+Open http://localhost:8000. (VS Code's "Live Server" extension also works.)
+
+## Deploy to GitHub Pages
+Push to the `main` branch to deploy the site automatically with the workflow in
+`.github/workflows/deploy.yml`. After the workflow succeeds, the site is available at
+https://goswamibhasker3-oss.github.io/taskflow-app/.
+
+## Architecture
+- `validation.js` – pure functions, no DOM or storage.
+- `taskManager.js` – owns the task list and rules. It talks to storage only through `getAll()` and `saveAll(tasks)`.
+- `storage.js` – `LocalStorageAdapter` implements those two async methods.
+- `ui.js` – the only file that touches the DOM.
+- `app.js` – wires the pieces together.
+
+### Adding a backend later
+Because storage methods are already `async`, you can write an `ApiStorageAdapter` (for example using `fetch` against a Flask or FastAPI service backed by SQLite/MySQL) with the same `getAll()` / `saveAll()` methods, then change one line in `app.js`:
+
+```js
+const manager = new TaskManager(new ApiStorageAdapter('/api/tasks'));
+```
+For a real API you would likely move to per-task methods (`create`, `update`, `delete`) instead of saving the whole list.
+
+## Future improvements
+- Backend with Flask/FastAPI and SQLite/MySQL, plus user accounts
+- Per-task storage methods instead of saving the full list
+- Categories/tags and subtasks
+- Drag-and-drop ordering
+- Due-date reminders
+- Undo after deleting
+- Export/import tasks as JSON
+- Automated tests for `validation.js` and `taskManager.js`
